@@ -6,7 +6,19 @@ from flask_cors import CORS
 import re # ◀◀◀ JSON 파싱을 위한 정규표현식 모듈
 
 app = Flask(__name__)
-CORS(app)  # 모든 도메인에서의 요청을 허용합니다.
+frontend_origin = "https://ho0215.github.io"
+
+# 2. CORS 설정을 더 구체적으로 적용합니다.
+CORS(app, resources={
+    r"/api/*": {  # /api/suggest-style, /api/find-style 등 /api/로 시작하는 모든 경로
+        "origins": [
+            frontend_origin, # ◀◀◀ 배포된 프론트엔드 (필수)
+            "http://localhost:5001" # ◀◀◀ 로컬 테스트용 (선택 사항)
+        ],
+        "methods": ["POST", "GET", "OPTIONS"],
+        "allow_headers": ["Content-Type"]
+    }
+})
 
 # --- [핵심] ---
 # [중요] API 키를 코드에서 제거하고, '환경 변수'에서 읽어옵니다.
@@ -285,3 +297,4 @@ if __name__ == '__main__':
     # 0.0.0.0으로 실행해야 Render가 연결할 수 있습니다.
     # 배포 환경에서는 debug=False가 권장됩니다.
     app.run(debug=False, host='0.0.0.0', port=port)
+
